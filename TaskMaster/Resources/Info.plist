@@ -36,12 +36,24 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
+	<!--
+		CFBundleURLTypes Configuration for Google Sign-In:
+		
+		IMPORTANT: Replace 'YOUR_REVERSED_CLIENT_ID' below with your actual 
+		REVERSED_CLIENT_ID from your GoogleService-Info.plist file.
+		
+		The REVERSED_CLIENT_ID has the format: com.googleusercontent.apps.YOUR_CLIENT_ID
+		
+		You can find this value in:
+		1. Your GoogleService-Info.plist file under the key 'REVERSED_CLIENT_ID'
+		2. The Firebase Console under Project Settings > Your iOS App
+	-->
 	<key>CFBundleURLTypes</key>
 	<array>
 		<dict>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>com.googleusercontent.apps.YOUR_CLIENT_ID</string>
+				<string>YOUR_REVERSED_CLIENT_ID</string>
 			</array>
 		</dict>
 	</array>

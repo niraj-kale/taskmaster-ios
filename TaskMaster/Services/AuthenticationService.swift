@@ -148,14 +148,7 @@ final class AuthenticationService: ObservableObject, AuthenticationServiceProtoc
         let config = GIDConfiguration(clientID: clientID)
         GIDSignIn.sharedInstance.configuration = config
         
-        guard let windowScene = await MainActor.run(body: {
-            UIApplication.shared.connectedScenes.first as? UIWindowScene
-        }),
-        let rootViewController = await MainActor.run(body: {
-            windowScene.windows.first?.rootViewController
-        }) else {
-            throw AuthError.googleSignInFailed
-        }
+        let rootViewController = try await getRootViewController()
         
         do {
             let result = try await GIDSignIn.sharedInstance.signIn(withPresenting: rootViewController)
@@ -181,6 +174,16 @@ final class AuthenticationService: ObservableObject, AuthenticationServiceProtoc
         } catch {
             throw AuthError.googleSignInFailed
         }
+    }
+    
+    /// Helper method to get the root view controller for Google Sign-In presentation
+    @MainActor
+    private func getRootViewController() throws -> UIViewController {
+        guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+              let rootViewController = windowScene.windows.first?.rootViewController else {
+            throw AuthError.googleSignInFailed
+        }
+        return rootViewController
     }
     
     func signOut() throws {

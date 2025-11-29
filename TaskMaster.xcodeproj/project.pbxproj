@@ -26,7 +26,7 @@
 		8B0001102C000001 /* Color+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B0000112C000001 /* Color+Extensions.swift */; };
 		8B0001112C000001 /* Date+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B0000122C000001 /* Date+Extensions.swift */; };
 		8B0001122C000001 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 8B0000132C000001 /* Assets.xcassets */; };
-		8B0001132C000001 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 8B0000142C000001 /* GoogleService-Info.plist */; };
+		8B0001132C000001 /* GoogleService-Info.plist.sample in Resources */ = {isa = PBXBuildFile; fileRef = 8B0000142C000001 /* GoogleService-Info.plist.sample */; };
 		8B0001142C000001 /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = 8B0000202C000001 /* FirebaseAuth */; };
 		8B0001152C000001 /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = 8B0000212C000001 /* FirebaseFirestore */; };
 		8B0001162C000001 /* GoogleSignIn in Frameworks */ = {isa = PBXBuildFile; productRef = 8B0000222C000001 /* GoogleSignIn */; };
@@ -54,7 +54,7 @@
 		8B0000112C000001 /* Color+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Color+Extensions.swift"; sourceTree = "<group>"; };
 		8B0000122C000001 /* Date+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Date+Extensions.swift"; sourceTree = "<group>"; };
 		8B0000132C000001 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		8B0000142C000001 /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		8B0000142C000001 /* GoogleService-Info.plist.sample */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist.sample"; sourceTree = "<group>"; };
 		8B0000152C000001 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -158,7 +158,7 @@
 			isa = PBXGroup;
 			children = (
 				8B0000132C000001 /* Assets.xcassets */,
-				8B0000142C000001 /* GoogleService-Info.plist */,
+				8B0000142C000001 /* GoogleService-Info.plist.sample */,
 				8B0000152C000001 /* Info.plist */,
 			);
 			path = Resources;
@@ -274,7 +274,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				8B0001122C000001 /* Assets.xcassets in Resources */,
-				8B0001132C000001 /* GoogleService-Info.plist in Resources */,
+				8B0001132C000001 /* GoogleService-Info.plist.sample in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

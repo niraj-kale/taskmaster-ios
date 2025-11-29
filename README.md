@@ -86,7 +86,8 @@ cd taskmaster-ios
 2. Create a new project or select an existing one
 3. Add an iOS app to your project with bundle ID: `com.taskmaster.ios`
 4. Download the `GoogleService-Info.plist` file
-5. Replace the placeholder `TaskMaster/Resources/GoogleService-Info.plist` with your downloaded file
+5. Copy the downloaded file to `TaskMaster/Resources/GoogleService-Info.plist`
+   - A sample file (`GoogleService-Info.plist.sample`) is provided as reference
 
 ### 3. Enable Firebase Services
 

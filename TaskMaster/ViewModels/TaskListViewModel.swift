@@ -251,7 +251,8 @@ final class TaskListViewModel: ObservableObject {
             do {
                 try await firestoreService.createCategory(category)
             } catch {
-                // Ignore errors for default category creation
+                // Log error but continue creating other categories
+                print("Failed to create default category '\(defaultCategory.name)': \(error.localizedDescription)")
             }
         }
     }
