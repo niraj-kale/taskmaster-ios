@@ -13,13 +13,14 @@ final class DependencyContainer {
     
     private init() {}
     
-    // MARK: - Auth
+    // MARK: - Repositories
     
-    lazy var firebaseAuthDataSource: FirebaseAuthDataSourceProtocol = {
-        FirebaseAuthDataSource()
-    }()
+    lazy var authRepository: AuthRepositoryProtocol = AuthRepository()
     
-    lazy var authRepository: AuthRepositoryProtocol = {
-        AuthRepository()
-    }()
+    // MARK: - View Models
+    
+    @MainActor
+    func makeAuthViewModel() -> AuthViewModel {
+        AuthViewModel(authRepository: authRepository)
+    }
 }

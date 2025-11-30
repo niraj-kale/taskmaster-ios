@@ -7,6 +7,9 @@
 
 import Foundation
 import FirebaseAuth
+import FirebaseCore
+import GoogleSignIn
+import UIKit
 
 final class AuthRepository: AuthRepositoryProtocol {
     
@@ -15,6 +18,8 @@ final class AuthRepository: AuthRepositoryProtocol {
     init(auth: Auth = Auth.auth()) {
         self.auth = auth
     }
+    
+    // MARK: - Email/Password
     
     func signIn(email: String, password: String) async throws -> User {
         let result = try await auth.signIn(withEmail: email, password: password)
@@ -26,32 +31,73 @@ final class AuthRepository: AuthRepositoryProtocol {
         return mapFirebaseUser(result.user)
     }
     
-    func signOut() async throws -> Bool {
-        try auth.signOut()
-        return true
-    }
+    // MARK: - Google Sign-In
     
-    func getCurrentUser() async throws -> User? {
-        guard let firebaseUser = auth.currentUser else {
-            return nil
-        }
-        return mapFirebaseUser(firebaseUser)
-    }
-    
+    @MainActor
     func signInWithGoogle() async throws -> User {
-        // TODO: Implement Google Sign-In
-        fatalError("Google Sign-In not yet implemented")
+        guard let clientID = FirebaseApp.app()?.options.clientID else {
+            throw AuthError.missingClientID
+        }
+        
+        GIDSignIn.sharedInstance.configuration = GIDConfiguration(clientID: clientID)
+        
+        guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+              let rootVC = windowScene.windows.first?.rootViewController else {
+            throw AuthError.noRootViewController
+        }
+        
+        let result = try await GIDSignIn.sharedInstance.signIn(withPresenting: rootVC)
+        
+        guard let idToken = result.user.idToken?.tokenString else {
+            throw AuthError.missingToken
+        }
+        
+        let credential = GoogleAuthProvider.credential(
+            withIDToken: idToken,
+            accessToken: result.user.accessToken.tokenString
+        )
+        
+        let authResult = try await auth.signIn(with: credential)
+        return mapFirebaseUser(authResult.user)
     }
     
-    // MARK: - Private Helpers
+    // MARK: - Session
     
-    private func mapFirebaseUser(_ firebaseUser: FirebaseAuth.User) -> User {
-        return User(
-            id: UUID(uuidString: firebaseUser.uid) ?? UUID(),
-            email: firebaseUser.email ?? "",
-            displayName: firebaseUser.displayName ?? "",
-            photoURL: firebaseUser.photoURL,
-            createdAt: firebaseUser.metadata.creationDate ?? Date()
+    func signOut() throws {
+        try auth.signOut()
+        GIDSignIn.sharedInstance.signOut()
+    }
+    
+    func getCurrentUser() -> User? {
+        guard let user = auth.currentUser else { return nil }
+        return mapFirebaseUser(user)
+    }
+    
+    // MARK: - Private
+    
+    private func mapFirebaseUser(_ user: FirebaseAuth.User) -> User {
+        User(
+            id: user.uid,
+            email: user.email ?? "",
+            displayName: user.displayName,
+            photoURL: user.photoURL,
+            createdAt: user.metadata.creationDate ?? Date()
         )
+    }
+}
+
+// MARK: - Auth Errors
+
+enum AuthError: LocalizedError {
+    case missingClientID
+    case noRootViewController
+    case missingToken
+    
+    var errorDescription: String? {
+        switch self {
+        case .missingClientID: return "Firebase client ID not found"
+        case .noRootViewController: return "Unable to present sign-in"
+        case .missingToken: return "Google sign-in failed"
+        }
     }
 }

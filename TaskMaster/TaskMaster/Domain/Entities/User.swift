@@ -7,19 +7,20 @@
 
 import Foundation
 
-public struct User: Codable {
-    let id: UUID
-    let email: String
-    let displayName: String
-    let photoURL: URL?
-    let createdAt: Date
+public struct User: Codable, Equatable, Identifiable {
+    public let id: String
+    public let email: String
+    public let displayName: String?
+    public let photoURL: URL?
+    public let createdAt: Date
     
-    init(
-        id: UUID = UUID(),
+    public init(
+        id: String = UUID().uuidString,
         email: String,
-        displayName: String,
-        photoURL: URL?,
-        createdAt: Date) {
+        displayName: String? = nil,
+        photoURL: URL? = nil,
+        createdAt: Date = Date()
+    ) {
         self.id = id
         self.email = email
         self.displayName = displayName
