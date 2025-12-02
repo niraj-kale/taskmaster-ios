@@ -23,7 +23,7 @@ enum Priority: Int, CaseIterable, Codable {
 }
 
 /// Domain entity representing a task
-struct Task: Identifiable, Equatable, Codable {
+struct Task: Identifiable, Equatable, Codable, Hashable {
     let id: UUID
     var title: String
     var description: String?

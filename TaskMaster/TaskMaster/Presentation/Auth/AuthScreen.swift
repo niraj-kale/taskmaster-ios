@@ -20,7 +20,12 @@ struct AuthScreen: View {
     var body: some View {
         ScrollView {
             VStack(spacing: 32) {
-                header
+                AppLogo(
+                    size: .medium,
+                    subtitle: viewModel.isSignUpMode ? "Create your account" : "Welcome back"
+                )
+                .padding(.top, 40)
+                
                 emailPasswordForm
                 divider
                 googleSignInButton
@@ -37,22 +42,6 @@ struct AuthScreen: View {
         .onChange(of: viewModel.currentUser) { _, user in
             if let user { onSuccess?(user) }
         }
-    }
-    
-    // MARK: - Header
-    
-    private var header: some View {
-        VStack(spacing: 8) {
-            Image(systemName: "checkmark.circle.fill")
-                .font(.system(size: 60))
-                .foregroundStyle(.blue)
-            Text("TaskMaster")
-                .font(.title.bold())
-            Text(viewModel.isSignUpMode ? "Create your account" : "Welcome back")
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
-        }
-        .padding(.top, 40)
     }
     
     // MARK: - Form
