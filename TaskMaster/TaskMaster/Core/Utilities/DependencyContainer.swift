@@ -18,6 +18,7 @@ final class DependencyContainer {
     lazy var authRepository: AuthRepositoryProtocol = AuthRepository()
     lazy var taskRepository: TaskRepositoryProtocol = TaskRepository()
     lazy var categoryRepository: CategoryRepositoryProtocol = CategoryRepository()
+    lazy var syncRepository: SyncRepositoryProtocol = SyncRepository()
     
     // MARK: - Use Cases (Auth)
     
@@ -67,6 +68,16 @@ final class DependencyContainer {
     
     lazy var deleteCategoryUseCase: DeleteCategoryUseCaseProtocol = {
         DeleteCategoryUseCase(categoryRepository: categoryRepository)
+    }()
+    
+    // MARK: - Use Cases (Sync)
+    
+    lazy var syncDataUseCase: SyncDataUseCaseProtocol = {
+        SyncDataUseCase(syncRepository: syncRepository)
+    }()
+    
+    lazy var resolveConflictUseCase: ResolveConflictUseCaseProtocol = {
+        ResolveConflictUseCase(taskRepository: taskRepository)
     }()
     
     // MARK: - View Models
@@ -122,5 +133,10 @@ final class DependencyContainer {
     @MainActor
     func makeCreateCategoryViewModel() -> CreateCategoryViewModel {
         CreateCategoryViewModel(createCategoryUseCase: createCategoryUseCase)
+    }
+    
+    @MainActor
+    func makeSyncStatusViewModel() -> SyncStatusViewModel {
+        SyncStatusViewModel(syncDataUseCase: syncDataUseCase)
     }
 }

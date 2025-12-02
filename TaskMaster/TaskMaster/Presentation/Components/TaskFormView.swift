@@ -50,7 +50,7 @@ struct TaskFormView: View {
     
     private var categorySection: some View {
         Section("Category") {
-            Picker("Category", selection: $categoryId) {
+            Picker("Category", selection: validatedCategoryBinding) {
                 Text("None").tag(nil as UUID?)
                 ForEach(categories) { category in
                     Label(category.name, systemImage: category.icon)
@@ -58,6 +58,18 @@ struct TaskFormView: View {
                 }
             }
         }
+    }
+    
+    /// Binding that validates categoryId against available categories
+    private var validatedCategoryBinding: Binding<UUID?> {
+        Binding(
+            get: {
+                // Return nil if selected category doesn't exist in the list
+                guard let id = categoryId else { return nil }
+                return categories.contains { $0.id == id } ? id : nil
+            },
+            set: { categoryId = $0 }
+        )
     }
     
     // MARK: - Priority Section
