@@ -48,4 +48,5 @@ private final class MockAuthRepo: AuthRepositoryProtocol {
     }
     
     func getCurrentUser() -> User? { nil }
+    func updateProfile(displayName: String?) async throws -> User { fatalError() }
 }

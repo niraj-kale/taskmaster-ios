@@ -73,6 +73,20 @@ final class AuthRepository: AuthRepositoryProtocol {
         return mapFirebaseUser(user)
     }
     
+    func updateProfile(displayName: String?) async throws -> User {
+        guard let user = auth.currentUser else {
+            throw AuthError.noCurrentUser
+        }
+        
+        let changeRequest = user.createProfileChangeRequest()
+        changeRequest.displayName = displayName
+        try await changeRequest.commitChanges()
+        
+        // Reload to get updated data
+        try await user.reload()
+        return mapFirebaseUser(user)
+    }
+    
     // MARK: - Private
     
     private func mapFirebaseUser(_ user: FirebaseAuth.User) -> User {
@@ -92,12 +106,14 @@ enum AuthError: LocalizedError {
     case missingClientID
     case noRootViewController
     case missingToken
+    case noCurrentUser
     
     var errorDescription: String? {
         switch self {
         case .missingClientID: return "Firebase client ID not found"
         case .noRootViewController: return "Unable to present sign-in"
         case .missingToken: return "Google sign-in failed"
+        case .noCurrentUser: return "No user is currently signed in"
         }
     }
 }

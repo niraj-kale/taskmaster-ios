@@ -58,7 +58,7 @@ private struct MainTabView: View {
     
     var body: some View {
         TabView {
-            TasksTab(onSignOut: onSignOut)
+            TasksTab()
                 .tabItem {
                     Label("Tasks", systemImage: "checklist")
                 }
@@ -67,6 +67,11 @@ private struct MainTabView: View {
                 .tabItem {
                     Label("Categories", systemImage: "folder")
                 }
+            
+            ProfileTab(onSignOut: onSignOut)
+                .tabItem {
+                    Label("Profile", systemImage: "person.circle")
+                }
         }
     }
 }
@@ -74,8 +79,6 @@ private struct MainTabView: View {
 // MARK: - Tasks Tab
 
 private struct TasksTab: View {
-    let onSignOut: () -> Void
-    
     @State private var taskListViewModel = DependencyContainer.shared.makeTaskListViewModel()
     @State private var showCreateTask = false
     @State private var selectedTask: Task?
@@ -88,12 +91,6 @@ private struct TasksTab: View {
                 onCreateTask: { showCreateTask = true },
                 onTaskTap: { selectedTask = $0 }
             )
-            .toolbar {
-                ToolbarItem(placement: .topBarLeading) {
-                    Button("Sign Out", role: .destructive, action: onSignOut)
-                        .font(.subheadline)
-                }
-            }
             .navigationDestination(item: $selectedTask) { task in
                 TaskDetailScreen(
                     viewModel: DependencyContainer.shared.makeTaskDetailViewModel(task: task),
@@ -165,6 +162,21 @@ private struct CategoriesTab: View {
                     }
                 )
             }
+        }
+    }
+}
+
+// MARK: - Profile Tab
+
+private struct ProfileTab: View {
+    let onSignOut: () -> Void
+    
+    var body: some View {
+        NavigationStack {
+            ProfileScreen(
+                viewModel: DependencyContainer.shared.makeProfileViewModel(),
+                onSignOut: onSignOut
+            )
         }
     }
 }

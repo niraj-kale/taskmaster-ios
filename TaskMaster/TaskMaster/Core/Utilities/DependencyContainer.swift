@@ -30,6 +30,10 @@ final class DependencyContainer {
         SignOutUseCase(authRepository: authRepository)
     }()
     
+    lazy var updateProfileUseCase: UpdateProfileUseCaseProtocol = {
+        UpdateProfileUseCase(authRepository: authRepository)
+    }()
+    
     // MARK: - Use Cases (Tasks)
     
     lazy var getTasksUseCase: GetTasksUseCaseProtocol = {
@@ -138,5 +142,13 @@ final class DependencyContainer {
     @MainActor
     func makeSyncStatusViewModel() -> SyncStatusViewModel {
         SyncStatusViewModel(syncDataUseCase: syncDataUseCase)
+    }
+    
+    @MainActor
+    func makeProfileViewModel() -> ProfileViewModel {
+        ProfileViewModel(
+            getCurrentUserUseCase: getCurrentUserUseCase,
+            updateProfileUseCase: updateProfileUseCase
+        )
     }
 }

@@ -13,4 +13,5 @@ protocol AuthRepositoryProtocol {
     func signInWithGoogle() async throws -> User
     func signOut() throws
     func getCurrentUser() -> User?
+    func updateProfile(displayName: String?) async throws -> User
 }

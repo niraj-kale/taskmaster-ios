@@ -43,4 +43,5 @@ private final class MockAuthRepo: AuthRepositoryProtocol {
     func signInWithGoogle() async throws -> User { fatalError() }
     func signOut() throws {}
     func getCurrentUser() -> User? { currentUser }
+    func updateProfile(displayName: String?) async throws -> User { fatalError() }
 }

@@ -143,4 +143,5 @@ final class MockAuthRepository: AuthRepositoryProtocol {
     
     func signOut() throws {}
     func getCurrentUser() -> User? { nil }
+    func updateProfile(displayName: String?) async throws -> User { fatalError() }
 }

@@ -141,4 +141,5 @@ private final class PreviewAuthRepository: AuthRepositoryProtocol {
     func signInWithGoogle() async throws -> User { User(email: "test@gmail.com") }
     func signOut() throws {}
     func getCurrentUser() -> User? { nil }
+    func updateProfile(displayName: String?) async throws -> User { User(email: "test@example.com", displayName: displayName) }
 }
