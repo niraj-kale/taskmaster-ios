@@ -15,6 +15,7 @@ final class TaskDetailViewModel {
     // MARK: - Properties
     
     var task: Task
+    var category: Category?
     var isLoading = false
     var errorMessage: String?
     var isDeleted = false
@@ -22,15 +23,32 @@ final class TaskDetailViewModel {
     // MARK: - Dependencies
     
     private let taskRepository: TaskRepositoryProtocol
+    private let getCategoriesUseCase: GetCategoriesUseCaseProtocol?
     
     // MARK: - Init
     
-    init(task: Task, taskRepository: TaskRepositoryProtocol) {
+    init(
+        task: Task,
+        taskRepository: TaskRepositoryProtocol,
+        getCategoriesUseCase: GetCategoriesUseCaseProtocol? = nil
+    ) {
         self.task = task
         self.taskRepository = taskRepository
+        self.getCategoriesUseCase = getCategoriesUseCase
     }
     
     // MARK: - Actions
+    
+    func loadCategory() async {
+        guard let categoryId = task.categoryId,
+              let useCase = getCategoriesUseCase else { return }
+        do {
+            let categories = try await useCase.execute()
+            category = categories.first { $0.id == categoryId }
+        } catch {
+            // Silently fail
+        }
+    }
     
     func toggleCompletion() async {
         task.isCompleted.toggle()

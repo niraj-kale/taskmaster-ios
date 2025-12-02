@@ -10,6 +10,7 @@ import SwiftUI
 struct TaskCard: View {
     
     let task: Task
+    var category: Category?
     var onToggle: (() -> Void)?
     var onTap: (() -> Void)?
     
@@ -34,6 +35,10 @@ struct TaskCard: View {
                 
                 HStack(spacing: 8) {
                     priorityBadge
+                    
+                    if let category {
+                        categoryBadge(category)
+                    }
                     
                     if let dueDate = task.dueDate {
                         dueDateLabel(dueDate)
@@ -76,6 +81,21 @@ struct TaskCard: View {
         }
     }
     
+    // MARK: - Category Badge
+    
+    private func categoryBadge(_ category: Category) -> some View {
+        HStack(spacing: 2) {
+            Image(systemName: category.icon)
+            Text(category.name)
+        }
+        .font(.caption2)
+        .padding(.horizontal, 6)
+        .padding(.vertical, 2)
+        .background(Color(hex: category.color)?.opacity(0.15) ?? Color.gray.opacity(0.15))
+        .foregroundStyle(Color(hex: category.color) ?? .gray)
+        .clipShape(Capsule())
+    }
+    
     // MARK: - Due Date
     
     private func dueDateLabel(_ date: Date) -> some View {
@@ -88,10 +108,29 @@ struct TaskCard: View {
     }
 }
 
+// MARK: - Color Extension
+
+private extension Color {
+    init?(hex: String) {
+        var hexSanitized = hex.trimmingCharacters(in: .whitespacesAndNewlines)
+        hexSanitized = hexSanitized.replacingOccurrences(of: "#", with: "")
+        
+        guard hexSanitized.count == 6,
+              let rgb = UInt64(hexSanitized, radix: 16) else { return nil }
+        
+        self.init(
+            red: Double((rgb >> 16) & 0xFF) / 255.0,
+            green: Double((rgb >> 8) & 0xFF) / 255.0,
+            blue: Double(rgb & 0xFF) / 255.0
+        )
+    }
+}
+
 #Preview {
     VStack(spacing: 12) {
         TaskCard(
             task: Task(title: "Buy groceries", priority: .high, dueDate: Date()),
+            category: Category(name: "Shopping", color: "#4CAF50", icon: "cart", createdAt: Date()),
             onToggle: {},
             onTap: {}
         )
@@ -104,6 +143,7 @@ struct TaskCard: View {
         
         TaskCard(
             task: Task(title: "Low priority item", priority: .low),
+            category: Category(name: "Work", color: "#007AFF", icon: "briefcase", createdAt: Date()),
             onToggle: {},
             onTap: {}
         )

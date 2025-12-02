@@ -19,6 +19,8 @@ final class EditTaskViewModel {
     var priority: Priority
     var dueDate: Date?
     var hasDueDate: Bool
+    var categoryId: UUID?
+    var categories: [Category] = []
     
     // MARK: - State
     
@@ -36,12 +38,18 @@ final class EditTaskViewModel {
     
     private let originalTask: Task
     private let updateTaskUseCase: UpdateTaskUseCaseProtocol
+    private let getCategoriesUseCase: GetCategoriesUseCaseProtocol?
     
     // MARK: - Init
     
-    init(task: Task, updateTaskUseCase: UpdateTaskUseCaseProtocol) {
+    init(
+        task: Task,
+        updateTaskUseCase: UpdateTaskUseCaseProtocol,
+        getCategoriesUseCase: GetCategoriesUseCaseProtocol? = nil
+    ) {
         self.originalTask = task
         self.updateTaskUseCase = updateTaskUseCase
+        self.getCategoriesUseCase = getCategoriesUseCase
         
         // Populate form with existing values
         self.title = task.title
@@ -49,9 +57,19 @@ final class EditTaskViewModel {
         self.priority = task.priority
         self.dueDate = task.dueDate
         self.hasDueDate = task.dueDate != nil
+        self.categoryId = task.categoryId
     }
     
     // MARK: - Actions
+    
+    func loadCategories() async {
+        guard let useCase = getCategoriesUseCase else { return }
+        do {
+            categories = try await useCase.execute()
+        } catch {
+            // Silently fail - categories are optional
+        }
+    }
     
     func updateTask() async {
         isLoading = true
@@ -62,6 +80,7 @@ final class EditTaskViewModel {
         task.description = description.isEmpty ? nil : description
         task.priority = priority
         task.dueDate = hasDueDate ? dueDate : nil
+        task.categoryId = categoryId
         task.updatedAt = Date()
         
         do {

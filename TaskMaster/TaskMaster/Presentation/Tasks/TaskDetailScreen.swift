@@ -48,6 +48,9 @@ struct TaskDetailScreen: View {
                 dismiss()
             }
         }
+        .task {
+            await viewModel.loadCategory()
+        }
     }
     
     // MARK: - Status Section
@@ -88,6 +91,12 @@ struct TaskDetailScreen: View {
             
             LabeledContent("Priority") {
                 PriorityBadge(priority: viewModel.task.priority)
+            }
+            
+            if let category = viewModel.category {
+                LabeledContent("Category") {
+                    CategoryBadge(category: category)
+                }
             }
             
             if let dueDate = viewModel.task.dueDate {
@@ -155,6 +164,48 @@ struct PriorityBadge: View {
         case .medium: return .orange
         case .high: return .red
         }
+    }
+}
+
+// MARK: - Category Badge (Reusable)
+
+struct CategoryBadge: View {
+    let category: Category
+    
+    var body: some View {
+        HStack(spacing: 4) {
+            Image(systemName: category.icon)
+            Text(category.name)
+        }
+        .font(.caption)
+        .fontWeight(.medium)
+        .padding(.horizontal, 8)
+        .padding(.vertical, 4)
+        .background(color.opacity(0.15))
+        .foregroundStyle(color)
+        .clipShape(Capsule())
+    }
+    
+    private var color: Color {
+        Color(hex: category.color) ?? .gray
+    }
+}
+
+// MARK: - Color Extension
+
+private extension Color {
+    init?(hex: String) {
+        var hexSanitized = hex.trimmingCharacters(in: .whitespacesAndNewlines)
+        hexSanitized = hexSanitized.replacingOccurrences(of: "#", with: "")
+        
+        guard hexSanitized.count == 6,
+              let rgb = UInt64(hexSanitized, radix: 16) else { return nil }
+        
+        self.init(
+            red: Double((rgb >> 16) & 0xFF) / 255.0,
+            green: Double((rgb >> 8) & 0xFF) / 255.0,
+            blue: Double(rgb & 0xFF) / 255.0
+        )
     }
 }
 

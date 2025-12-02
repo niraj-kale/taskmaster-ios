@@ -89,6 +89,7 @@ struct TaskListScreen: View {
     private func taskRow(_ task: Task) -> some View {
         TaskCard(
             task: task,
+            category: viewModel.category(for: task),
             onToggle: {
                 _Concurrency.Task { await viewModel.toggleTask(task) }
             },

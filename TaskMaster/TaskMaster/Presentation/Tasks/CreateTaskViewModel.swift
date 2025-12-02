@@ -19,6 +19,8 @@ final class CreateTaskViewModel {
     var priority: Priority = .medium
     var dueDate: Date?
     var hasDueDate = false
+    var categoryId: UUID?
+    var categories: [Category] = []
     
     var isLoading = false
     var errorMessage: String?
@@ -29,14 +31,28 @@ final class CreateTaskViewModel {
     // MARK: - Dependencies
     
     private let createTaskUseCase: CreateTaskUseCaseProtocol
+    private let getCategoriesUseCase: GetCategoriesUseCaseProtocol?
     
     // MARK: - Init
     
-    init(createTaskUseCase: CreateTaskUseCaseProtocol) {
+    init(
+        createTaskUseCase: CreateTaskUseCaseProtocol,
+        getCategoriesUseCase: GetCategoriesUseCaseProtocol? = nil
+    ) {
         self.createTaskUseCase = createTaskUseCase
+        self.getCategoriesUseCase = getCategoriesUseCase
     }
     
     // MARK: - Actions
+    
+    func loadCategories() async {
+        guard let useCase = getCategoriesUseCase else { return }
+        do {
+            categories = try await useCase.execute()
+        } catch {
+            // Silently fail - categories are optional
+        }
+    }
     
     func createTask() async {
         guard isFormValid else { return }
@@ -48,7 +64,8 @@ final class CreateTaskViewModel {
             title: title.trimmingCharacters(in: .whitespaces),
             description: description.isEmpty ? nil : description,
             priority: priority,
-            dueDate: hasDueDate ? dueDate : nil
+            dueDate: hasDueDate ? dueDate : nil,
+            categoryId: categoryId
         )
         
         do {

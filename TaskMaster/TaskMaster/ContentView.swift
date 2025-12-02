@@ -56,6 +56,26 @@ struct ContentView: View {
 private struct MainTabView: View {
     let onSignOut: () -> Void
     
+    var body: some View {
+        TabView {
+            TasksTab(onSignOut: onSignOut)
+                .tabItem {
+                    Label("Tasks", systemImage: "checklist")
+                }
+            
+            CategoriesTab()
+                .tabItem {
+                    Label("Categories", systemImage: "folder")
+                }
+        }
+    }
+}
+
+// MARK: - Tasks Tab
+
+private struct TasksTab: View {
+    let onSignOut: () -> Void
+    
     @State private var taskListViewModel = DependencyContainer.shared.makeTaskListViewModel()
     @State private var showCreateTask = false
     @State private var selectedTask: Task?
@@ -78,14 +98,12 @@ private struct MainTabView: View {
                 TaskDetailScreen(
                     viewModel: DependencyContainer.shared.makeTaskDetailViewModel(task: task),
                     onTaskUpdated: { updated in
-                        // Update task in list
                         if let index = taskListViewModel.tasks.firstIndex(where: { $0.id == updated.id }) {
                             taskListViewModel.tasks[index] = updated
                         }
                     },
                     onTaskDeleted: {
                         selectedTask = nil
-                        // Reload list after deletion
                         _Concurrency.Task { await taskListViewModel.loadTasks() }
                     }
                 )
@@ -99,7 +117,6 @@ private struct MainTabView: View {
                 CreateTaskScreen(
                     viewModel: DependencyContainer.shared.makeCreateTaskViewModel(),
                     onTaskCreated: { _ in
-                        // Reload list after creation
                         _Concurrency.Task { await taskListViewModel.loadTasks() }
                     }
                 )
@@ -109,10 +126,42 @@ private struct MainTabView: View {
                     viewModel: DependencyContainer.shared.makeEditTaskViewModel(task: task),
                     onTaskUpdated: { updated in
                         selectedTask = updated
-                        // Update task in list
                         if let index = taskListViewModel.tasks.firstIndex(where: { $0.id == updated.id }) {
                             taskListViewModel.tasks[index] = updated
                         }
+                    }
+                )
+            }
+        }
+    }
+}
+
+// MARK: - Categories Tab
+
+private struct CategoriesTab: View {
+    @State private var categoryListViewModel = DependencyContainer.shared.makeCategoryListViewModel()
+    @State private var showCreateCategory = false
+    
+    var body: some View {
+        NavigationStack {
+            CategoryListScreen(
+                viewModel: categoryListViewModel,
+                onCategoryTap: nil
+            )
+            .toolbar {
+                ToolbarItem(placement: .primaryAction) {
+                    Button {
+                        showCreateCategory = true
+                    } label: {
+                        Image(systemName: "plus")
+                    }
+                }
+            }
+            .sheet(isPresented: $showCreateCategory) {
+                CreateCategorySheet(
+                    viewModel: DependencyContainer.shared.makeCreateCategoryViewModel(),
+                    onCategoryCreated: { _ in
+                        _Concurrency.Task { await categoryListViewModel.loadCategories() }
                     }
                 )
             }

@@ -15,8 +15,10 @@ final class TaskListViewModel {
     // MARK: - Properties
     
     var tasks: [Task] = []
+    var categories: [Category] = []
     var isLoading = false
     var errorMessage: String?
+    var selectedCategoryId: UUID?
     
     var pendingTasks: [Task] { tasks.filter { !$0.isCompleted } }
     var completedTasks: [Task] { tasks.filter { $0.isCompleted } }
@@ -25,16 +27,29 @@ final class TaskListViewModel {
     // MARK: - Dependencies
     
     private let getTasksUseCase: GetTasksUseCaseProtocol
+    private let getTasksByCategoryUseCase: GetTasksByCategoryUseCaseProtocol?
+    private let getCategoriesUseCase: GetCategoriesUseCaseProtocol?
     private let taskRepository: TaskRepositoryProtocol
     
     // MARK: - Init
     
     init(
         getTasksUseCase: GetTasksUseCaseProtocol,
-        taskRepository: TaskRepositoryProtocol
+        taskRepository: TaskRepositoryProtocol,
+        getTasksByCategoryUseCase: GetTasksByCategoryUseCaseProtocol? = nil,
+        getCategoriesUseCase: GetCategoriesUseCaseProtocol? = nil
     ) {
         self.getTasksUseCase = getTasksUseCase
         self.taskRepository = taskRepository
+        self.getTasksByCategoryUseCase = getTasksByCategoryUseCase
+        self.getCategoriesUseCase = getCategoriesUseCase
+    }
+    
+    // MARK: - Category Lookup
+    
+    func category(for task: Task) -> Category? {
+        guard let categoryId = task.categoryId else { return nil }
+        return categories.first { $0.id == categoryId }
     }
     
     // MARK: - Actions
@@ -43,13 +58,36 @@ final class TaskListViewModel {
         isLoading = true
         errorMessage = nil
         
+        // Load categories in parallel
+        async let categoriesTask: () = loadCategories()
+        
         do {
-            tasks = try await getTasksUseCase.execute()
+            if let categoryId = selectedCategoryId,
+               let useCase = getTasksByCategoryUseCase {
+                tasks = try await useCase.execute(categoryId: categoryId)
+            } else {
+                tasks = try await getTasksUseCase.execute()
+            }
         } catch {
             errorMessage = error.localizedDescription
         }
         
+        await categoriesTask
         isLoading = false
+    }
+    
+    private func loadCategories() async {
+        guard let useCase = getCategoriesUseCase else { return }
+        do {
+            categories = try await useCase.execute()
+        } catch {
+            // Silently fail - categories are optional for display
+        }
+    }
+    
+    func filterByCategory(_ categoryId: UUID?) async {
+        selectedCategoryId = categoryId
+        await loadTasks()
     }
     
     func toggleTask(_ task: Task) async {

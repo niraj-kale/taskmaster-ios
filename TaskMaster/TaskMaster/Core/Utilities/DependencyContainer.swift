@@ -17,6 +17,7 @@ final class DependencyContainer {
     
     lazy var authRepository: AuthRepositoryProtocol = AuthRepository()
     lazy var taskRepository: TaskRepositoryProtocol = TaskRepository()
+    lazy var categoryRepository: CategoryRepositoryProtocol = CategoryRepository()
     
     // MARK: - Use Cases (Auth)
     
@@ -54,6 +55,20 @@ final class DependencyContainer {
         ToggleTaskCompletionUseCase(taskRepository: taskRepository)
     }()
     
+    // MARK: - Use Cases (Categories)
+    
+    lazy var getCategoriesUseCase: GetCategoriesUseCaseProtocol = {
+        GetCategoriesUseCase(categoryRepository: categoryRepository)
+    }()
+    
+    lazy var createCategoryUseCase: CreateCategoryUseCaseProtocol = {
+        CreateCategoryUseCase(categoryRepository: categoryRepository)
+    }()
+    
+    lazy var deleteCategoryUseCase: DeleteCategoryUseCaseProtocol = {
+        DeleteCategoryUseCase(categoryRepository: categoryRepository)
+    }()
+    
     // MARK: - View Models
     
     @MainActor
@@ -65,22 +80,47 @@ final class DependencyContainer {
     func makeTaskListViewModel() -> TaskListViewModel {
         TaskListViewModel(
             getTasksUseCase: getTasksUseCase,
-            taskRepository: taskRepository
+            taskRepository: taskRepository,
+            getCategoriesUseCase: getCategoriesUseCase
         )
     }
     
     @MainActor
     func makeCreateTaskViewModel() -> CreateTaskViewModel {
-        CreateTaskViewModel(createTaskUseCase: createTaskUseCase)
+        CreateTaskViewModel(
+            createTaskUseCase: createTaskUseCase,
+            getCategoriesUseCase: getCategoriesUseCase
+        )
     }
     
     @MainActor
     func makeTaskDetailViewModel(task: Task) -> TaskDetailViewModel {
-        TaskDetailViewModel(task: task, taskRepository: taskRepository)
+        TaskDetailViewModel(
+            task: task,
+            taskRepository: taskRepository,
+            getCategoriesUseCase: getCategoriesUseCase
+        )
     }
     
     @MainActor
     func makeEditTaskViewModel(task: Task) -> EditTaskViewModel {
-        EditTaskViewModel(task: task, updateTaskUseCase: updateTaskUseCase)
+        EditTaskViewModel(
+            task: task,
+            updateTaskUseCase: updateTaskUseCase,
+            getCategoriesUseCase: getCategoriesUseCase
+        )
+    }
+    
+    @MainActor
+    func makeCategoryListViewModel() -> CategoryListViewModel {
+        CategoryListViewModel(
+            getCategoriesUseCase: getCategoriesUseCase,
+            deleteCategoryUseCase: deleteCategoryUseCase
+        )
+    }
+    
+    @MainActor
+    func makeCreateCategoryViewModel() -> CreateCategoryViewModel {
+        CreateCategoryViewModel(createCategoryUseCase: createCategoryUseCase)
     }
 }

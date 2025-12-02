@@ -15,11 +15,15 @@ struct TaskFormView: View {
     @Binding var priority: Priority
     @Binding var dueDate: Date?
     @Binding var hasDueDate: Bool
+    @Binding var categoryId: UUID?
+    
+    var categories: [Category] = []
     
     var body: some View {
         Form {
             titleSection
             detailsSection
+            categorySection
             prioritySection
             dueDateSection
         }
@@ -39,6 +43,20 @@ struct TaskFormView: View {
         Section("Details") {
             TextField("Description (optional)", text: $description, axis: .vertical)
                 .lineLimit(3...6)
+        }
+    }
+    
+    // MARK: - Category Section
+    
+    private var categorySection: some View {
+        Section("Category") {
+            Picker("Category", selection: $categoryId) {
+                Text("None").tag(nil as UUID?)
+                ForEach(categories) { category in
+                    Label(category.name, systemImage: category.icon)
+                        .tag(category.id as UUID?)
+                }
+            }
         }
     }
     

@@ -25,7 +25,9 @@ struct EditTaskScreen: View {
                 description: $viewModel.description,
                 priority: $viewModel.priority,
                 dueDate: $viewModel.dueDate,
-                hasDueDate: $viewModel.hasDueDate
+                hasDueDate: $viewModel.hasDueDate,
+                categoryId: $viewModel.categoryId,
+                categories: viewModel.categories
             )
             .navigationTitle("Edit Task")
             .navigationBarTitleDisplayMode(.inline)
@@ -55,6 +57,9 @@ struct EditTaskScreen: View {
                     onTaskUpdated?(task)
                     dismiss()
                 }
+            }
+            .task {
+                await viewModel.loadCategories()
             }
         }
     }
