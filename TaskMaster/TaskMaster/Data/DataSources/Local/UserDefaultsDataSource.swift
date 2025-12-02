@@ -15,24 +15,27 @@ protocol UserDefaultsDataSourceProtocol {
 final class UserDefaultsDataSource: UserDefaultsDataSourceProtocol {
     
     private let defaults: UserDefaults
-    private let key = "user_preferences"
+    
+    // Keys match @AppStorage keys in TaskMasterApp
+    private enum Keys {
+        static let darkMode = "user_preferences_dark_mode"
+        static let notifications = "user_preferences_notifications"
+    }
     
     init(defaults: UserDefaults = .standard) {
         self.defaults = defaults
     }
     
     func getPreferences() -> UserPreferences {
-        guard let data = defaults.data(forKey: key),
-              let preferences = try? JSONDecoder().decode(UserPreferences.self, from: data) else {
-            return .default
-        }
-        return preferences
+        UserPreferences(
+            isDarkMode: defaults.bool(forKey: Keys.darkMode),
+            notificationsEnabled: defaults.object(forKey: Keys.notifications) as? Bool ?? true
+        )
     }
     
     func savePreferences(_ preferences: UserPreferences) {
-        if let data = try? JSONEncoder().encode(preferences) {
-            defaults.set(data, forKey: key)
-        }
+        defaults.set(preferences.isDarkMode, forKey: Keys.darkMode)
+        defaults.set(preferences.notificationsEnabled, forKey: Keys.notifications)
     }
 }
 

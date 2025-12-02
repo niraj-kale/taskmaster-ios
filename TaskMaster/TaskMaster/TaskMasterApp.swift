@@ -21,9 +21,12 @@ struct TaskMasterApp: App {
     // register app delegate
     @UIApplicationDelegateAdaptor(TaskMasterAppDelegate.self) var appDelegate: TaskMasterAppDelegate
     
+    @AppStorage("user_preferences_dark_mode") private var isDarkMode = false
+    
     var body: some Scene {
         WindowGroup {
             ContentView()
+                .preferredColorScheme(isDarkMode ? .dark : .light)
         }
     }
 }
